@@ -112,15 +112,42 @@ def generate_random_operator(operator_id):
                     random.choice(positions), random.randint(1, 3))
 
 #эскпорт в json
-def export_to_json(chats, users, operators):
-    data = {
-        'chats': [chat.to_dict() for chat in chats],
-        'users': [user.to_dict() for user in users],
-        'operators': [operator.to_dict() for operator in operators]
-    }
-    with open('.venv/platform_data.json', 'w') as f:
+def export_data(chats=None, users=None, operators=None, filename='platform_data.json'):
+    data = {}
+    if chats:
+        data['chats'] = [chat.to_dict() for chat in chats]
+    if users:
+        data['users'] = [user.to_dict() for user in users]
+    if operators:
+        data['operators'] = [operator.to_dict() for operator in operators]
+
+    with open(filename, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
-    print(json.dumps(data, ensure_ascii=False, indent=4))
+
+    print(f'Файл {filename} успешно создан!')
+
+def export_chats_by_operator(operator_id, chats):
+    filtered_chats = [chat.to_dict() for chat in chats if chat.operator.operator_id == operator_id]
+    data = {'Фильтрация по оператору': filtered_chats}
+
+    filename = f'chats_operator_{operator_id}.json'
+    with open(filename, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
+    print(f'Файл {filename} успешно создан!')
+
+
+def export_chats_by_user(user_id, chats):
+    filtered_chats = [chat.to_dict() for chat in chats if chat.user.user_id == user_id]
+    data = {'Фильтрация по пользователю': filtered_chats}
+
+    filename = f'chats_user_{user_id}.json'
+    with open(filename, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
+    print(f'Файл {filename} успешно создан!')
+
+
 
 #генерация чата
 def generate_random_chat(chat_id, operator, user):
@@ -143,15 +170,20 @@ def generate_num_chats(num_chats):
 chats, users, operators = generate_num_chats(100)
 
 for chat in chats:
-    print(chat)
+ print(chat)
 
 for user in users:
-    print(user)
+ print(user)
 
 for operator in operators:
     print(operator)
 
-export_to_json(chats, users, operators)  # Экспорт данных в JSON
+export_chats_by_operator(1, chats)  # Выгрузит чаты оператора с ID = 1
+export_chats_by_user(5, chats)  # Выгрузит чаты пользователя с ID = 5
+export_data(chats=chats, filename='all_chats.json')
+export_data(users=users, filename='users.json')
+export_data(operators=operators, filename='operators.json')
+
 
 #operator = Operator(1, "Иван", "Иванов", "Иванович", "19-09-2001", "Москва", "Москва", "Москва",)
 #print(operator)
